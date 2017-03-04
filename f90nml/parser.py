@@ -352,8 +352,13 @@ class Parser(object):
                 p_idx = 0
 
             # Add variables until next variable trigger
+            # NOTE: Second check is for non-delimited strings of control tokens
+            #       List may need to be expanded.
+            #  XXX: And not yet working anyway...
+            # NOTE: Third check is for complex variables
             while (self.token not in ('=', '(', '%') or
-                   (self.prior_token, self.token) == ('=', '(')):
+                    (self.token in ('%',) and not is_f90name(self.prior_token)) or
+                    (self.prior_token, self.token) == ('=', '(')):
 
                 # Check for repeated values
                 if self.token == '*':
@@ -680,3 +685,7 @@ def delist(values):
         return values[0]
     else:
         return values
+
+
+def is_f90name(name):
+    return name.isidentifier() and name[0] != '_'
